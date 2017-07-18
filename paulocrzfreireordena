@@ -1,0 +1,270 @@
+# -*- coding: utf-8 -*-
+import random
+import math
+import timeit
+import matplotlib.pyplot as plt
+ 
+quantElementos = [100, 300, 600, 900, 1200, 1500, 1800, 2100, 2400]
+ 
+def crialistarand(tam, lista):
+    random.seed()
+    i = 0
+    while i < tam:
+        num = random.randint(1, 10 * tam)
+        if num not in lista:
+            lista.append(num)
+        i += 1
+ 
+ 
+def bubblesort(lista):
+    temp = 0
+    for i in range(0, len(lista) - 1):
+        for j in range(i + 1, len(lista)):
+            if lista[i] > lista[j]:
+                temp = lista[i]
+                lista[i] = lista[j]
+                lista[j] = temp
+ 
+ 
+def selectionsort(lista):
+    for i in range(0, len(lista)):
+        menor_elem = i
+        for j in range(i, len(lista)):
+            if lista[j] < lista[menor_elem]:
+                menor_elem = j
+        lista[menor_elem], lista[i] = lista[i], lista[menor_elem]
+ 
+ 
+def insertionsort(lista):
+    for i in range(1, len(lista)):
+        checar = lista[i]
+        j = i
+        while j > 0 and checar < lista[j - 1]:
+            lista[j] = lista[j - 1]
+            j -= 1
+        lista[j] = checar
+ 
+ 
+def partition(array, begin, end):
+    pivot = begin
+    for i in range(begin + 1, end + 1):
+        if array[i] <= array[begin]:
+            pivot += 1
+            array[i], array[pivot] = array[pivot], array[i]
+    array[pivot], array[begin] = array[begin], array[pivot]
+    return pivot
+ 
+ 
+def quicksort(array, begin=0, end=None):
+    if end is None:
+        end = len(array) - 1
+ 
+    def _quicksort(array, begin, end):
+        if begin >= end:
+            return
+        pivot = partition(array, begin, end)
+        _quicksort(array, begin, pivot - 1)
+        _quicksort(array, pivot + 1, end)
+ 
+    return _quicksort(array, begin, end)
+ 
+ 
+def mergeSort(lista):
+    if len(lista) < 2:
+        return lista
+    metade = int(len(lista) / 2)
+    return merge(mergeSort(lista[:metade]), mergeSort(lista[metade:]))
+ 
+ 
+def merge(listEa, listDa):
+    final = []
+    while listEa and listDa:
+ 
+        if len(listEa) and len(listDa):
+            if listEa[0] < listDa[0]:
+                final.append(listEa.pop(0))
+            else:
+                final.append(listDa.pop(0))
+ 
+        if not len(listEa) and len(listDa):
+            final.append(listDa.pop(0))
+        if not len(listDa) and len(listEa):
+            final.append(listEa.pop(0))
+ 
+    return final
+ 
+def shellSort(alist):
+    sublistcount = len(alist)//2
+    while sublistcount > 0:
+ 
+      for startposition in range(sublistcount):
+        gapInsertionSort(alist,startposition,sublistcount)
+      sublistcount = sublistcount // 2
+ 
+def gapInsertionSort(alist,start,gap):
+    for i in range(start+gap,len(alist),gap):
+ 
+        currentvalue = alist[i]
+        position = i
+ 
+        while position>=gap and alist[position-gap]>currentvalue:
+            alist[position]=alist[position-gap]
+            position = position-gap
+ 
+        alist[position]=currentvalue
+ 
+ 
+def heapsort(lista):
+    def heapify(lista):
+        start = (len(lista) - 2) // 2
+        while start >= 0:
+            siftDown(lista, start, len(lista) - 1)
+            start -= 1
+ 
+    def siftDown(lista, start, end):
+        raiz = start
+        while raiz * 2 + 1 <= end:
+            filha = raiz * 2 + 1
+            if filha + 1 <= end and lista[filha] < lista[filha + 1]:
+                filha += 1
+            if filha <= end and lista[raiz] < lista[filha]:
+                lista[raiz], lista[filha] = lista[filha], lista[raiz]
+                raiz = filha
+            else:
+                return
+ 
+    heapify(lista)
+    end = len(lista) - 1
+    while end > 0:
+        lista[end], lista[0] = lista[0], lista[end]
+        siftDown(lista, 0, end - 1)
+        end -= 1
+ 
+def countingSort(lista):
+    valorMax = max(lista)
+    posicoesVetorContagem = valorMax + 1
+    vetorContagem = [0] * posicoesVetorContagem
+    for i in lista:
+        vetorContagem[i] += 1
+    i = 0
+    for a in range(0,posicoesVetorContagem):
+        for b in range(0,vetorContagem[a]):
+            lista[i] = a
+            i += 1
+    return lista
+ 
+def radix_sort( aList ):
+  RADIX = 10
+  maxLength = False
+  tmp , placement = -1, 1
+ 
+  while not maxLength:
+    maxLength = True
+    buckets = [list() for _ in range( RADIX )]
+    for  i in aList:
+      tmp = i // placement
+      buckets[tmp % RADIX].append( i )
+      if maxLength and tmp > 0:
+        maxLength = False
+ 
+    a = 0
+    for b in range( RADIX ):
+      buck = buckets[b]
+      for i in buck:
+        aList[a] = i
+        a += 1
+ 
+    placement *= RADIX
+  return aList
+ 
+def hashing( A ):
+  m = A[0]
+  for i in range( 1, len( A ) ):
+    if ( m < A[i] ):
+      m = A[i]
+  result = [m, int( math.sqrt( len( A ) ) )]
+  return result
+ 
+def re_hashing( i, code ):
+  return int( i / code[0] * ( code[1] - 1 ) )
+ 
+def bucketsort(A):
+    code = hashing(A)
+    buckets = [list() for _ in range(code[1])]
+    for i in A:
+        x = re_hashing(i, code)
+        buck = buckets[x]
+        buck.append(i)
+ 
+    for bucket in buckets:
+        quicksort(bucket)
+ 
+    ndx = 0
+    for b in range(len(buckets)):
+        for v in buckets[b]:
+            A[ndx] = v
+            ndx += 1
+ 
+ 
+lista_bubble = []
+lista_select = []
+lista_insertion = []
+lista_quick = []
+lista_merge = []
+lista_Shell = []
+lista_counting = []
+lista_radix = []
+lista_bucket = []
+lista_heap = []
+ 
+for elementos in quantElementos:
+    lista_elem = []
+    print(elementos)
+    crialistarand(elementos, lista_elem)
+    lista_temp = list(lista_elem)
+    lista_bubble.append(
+        timeit.timeit("bubblesort({})".format(lista_temp), setup="from __main__ import bubblesort", number=1))
+    lista_temp = list(lista_elem)
+    lista_select.append(
+        timeit.timeit("selectionsort({})".format(lista_temp), setup="from __main__ import selectionsort", number=1))
+    lista_temp = list(lista_elem)
+    lista_insertion.append(
+        timeit.timeit("insertionsort({})".format(lista_temp), setup="from __main__ import insertionsort", number=1))
+    lista_temp = list(lista_elem)
+    lista_quick.append(
+        timeit.timeit("quicksort({})".format(lista_temp), setup="from __main__ import quicksort", number=1))
+    lista_temp = list(lista_elem)
+    lista_merge.append(
+        timeit.timeit("mergeSort({})".format(lista_temp), setup="from __main__ import mergeSort", number=1))
+    lista_temp = list(lista_elem)
+    lista_Shell.append(
+        timeit.timeit("shellSort({})".format(lista_temp), setup="from __main__ import shellSort", number=1))
+    lista_temp = list(lista_elem)
+    lista_counting.append(
+        timeit.timeit("countingSort({})".format(lista_temp), setup="from __main__ import countingSort", number=1))
+    lista_temp = list(lista_elem)
+    lista_radix.append(
+        timeit.timeit("radix_sort({})".format(lista_temp), setup="from __main__ import radix_sort", number=1))
+    lista_temp = list(lista_elem)
+    lista_radix.append(
+        timeit.timeit("heapsort({})".format(lista_temp), setup="from __main__ import heapsort", number=1))
+ 
+fig, ax = plt.subplots()
+ax.plot(quantElementos, lista_bubble, color="green", label="BubbleSort")
+ax.plot(quantElementos, lista_select, color="blue", label="Selection Sort")
+ax.plot(quantElementos, lista_insertion, color="purple", label="Insertion Sort")
+ax.plot(quantElementos, lista_quick, color="orange", label="Quick Sort")
+ax.plot(quantElementos, lista_merge, color="red", label="Merge Sort")
+ax.plot(quantElementos, lista_Shell, color="yellow", label="Shell Sort")
+ax.plot(quantElementos, lista_counting, color="pink", label="Counting Sort")
+ax.plot(quantElementos, lista_counting, color="brown", label="Radix Sort")
+ax.plot(quantElementos, lista_counting, color="grey", label="Bucket Sort")
+ax.plot(quantElementos, lista_counting, color="violet", label="HeapSort")
+ 
+ 
+legend = plt.legend(loc='upper center', shadow=True)
+ 
+plt.xlabel('Elementos')
+plt.ylabel('Tempo')
+plt.title('Bubble x Selection x Insertion x Quick x Merge x Shell x Counting x Radix x Bucket x Heap')
+plt.show()
